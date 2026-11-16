@@ -67,6 +67,8 @@ function! async#compiler#compile(remake, args, jump, mods) abort
     let l:makeargs = input('(' . l:makeprg . '): ')
   endif
 
+  let l:makeargs = expandcmd(l:makeargs)
+
   if l:makeprg =~# '\$\*'
     let l:makeprg = substitute(l:makeprg, '\$\*', { -> l:makeargs }, 'g')
   else
