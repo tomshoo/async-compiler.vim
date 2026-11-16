@@ -2,30 +2,20 @@ let s:last_makeargs  = 0
 let s:last_makebufnr = 0
 
 function! s:post_makeprg(job_id, exit_code, ...) dict abort
-  let l:sequence = printf("\e]777;notify;%s;%s\e\\",
-        \ !a:exit_code ? 'Done compiling' : printf('Compilation failed (%d)', a:exit_code),
-        \ self._title)
-
-  if exists('$TMUX')
-    let l:sequence = "\ePtmux;\e" . l:sequence
-  endif
-
-  if has('nvim')
-    call nvim_ui_send(l:sequence)
-  else
-    call writefile([l:sequence], '/dev/tty', 'b')
-  endif
-
   if a:exit_code
     call setqflist([], 'a', #{id: self._qfid, title: printf('(Exit Code: %d) %s', a:exit_code, self._title)})
   endif
 
   call win_gotoid(self._curwinid)
+
   doautocmd <nomodeline> QuickFixCmdPost make
+  doautocmd <nomodeline> User CompilationCompleted
 
   if self._shouldjump
     silent! cc
   endif
+
+  unlet! s:current_compilation_job
 endfunction
 
 function! s:append_lines(job_id, buffer, event) dict abort
@@ -45,8 +35,6 @@ if !has('nvim')
 
     call a:opts.on_stdout(process, split(a:opts._lines, '\n'), 'exit')
     call a:opts.on_exit(process, a:exit_code, 'exit')
-
-    unlet! s:current_compilation_job
   endfunction
 
   function! s:translate_options(opts)
