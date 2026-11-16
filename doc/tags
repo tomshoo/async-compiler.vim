@@ -1,0 +1,5 @@
+:Compile	async-compiler.txt	/*:Compile*
+:KillCompilation	async-compiler.txt	/*:KillCompilation*
+:ReCompile	async-compiler.txt	/*:ReCompile*
+async-compiler.txt	async-compiler.txt	/*async-compiler.txt*
+async-compiler.vim	async-compiler.txt	/*async-compiler.vim*
